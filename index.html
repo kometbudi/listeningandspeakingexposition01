@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Lab Maya | Exposition Text – Social Media Problem</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #0b1020; font-family: 'Segoe UI', Tahoma, sans-serif; color: #e8ecf8; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+  :root { --bubble-size: 13px; }
+
+  .stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at top, #1b2550 0%, #0b1020 70%); }
+  .frame { position: relative; width: 100vw; height: 56.25vw; max-height: 100vh; max-width: 177.78vh; background: linear-gradient(135deg, #1a2555 0%, #2a1a55 50%, #15204a 100%); overflow: hidden; box-shadow: 0 0 60px rgba(100,140,255,.25); border-radius: 10px; }
+  .frame::before{ content:""; position:absolute; inset:0; background: radial-gradient(circle at 15% 20%, rgba(120,180,255,.15), transparent 40%), radial-gradient(circle at 85% 80%, rgba(255,120,200,.12), transparent 40%); pointer-events:none; }
+
+  .splash { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f1a45 0%, #2a1450 100%); z-index: 100; transition: opacity .8s ease, visibility .8s; }
+  .splash.hide { opacity: 0; visibility: hidden; }
+  .splash-logo { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(from 0deg, #6ea8ff, #b36eff, #ff7ab6, #6ea8ff); display:flex; align-items:center; justify-content:center; animation: spin 6s linear infinite; box-shadow: 0 0 40px rgba(150,120,255,.5); }
+  .splash-logo svg { width: 70%; height: 70%; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .splash h1 { margin-top: 20px; font-size: clamp(20px, 3.2vw, 42px); background: linear-gradient(90deg,#9ecbff,#d89eff,#ffb3d9); -webkit-background-clip: text; background-clip: text; color: transparent; text-align:center; }
+  .splash h2 { margin-top: 8px; font-size: clamp(12px, 1.6vw, 18px); color: #b9c3e6; font-weight: 400; text-align:center; }
+  .splash .sub { margin-top: 6px; font-size: clamp(10px, 1.2vw, 14px); color:#8892b8; }
+  .loadbar { margin-top: 30px; width: 60%; max-width: 420px; height: 10px; background: rgba(255,255,255,.08); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); }
+  .loadbar > div { height: 100%; width: 0%; background: linear-gradient(90deg,#6ea8ff,#b36eff,#ff7ab6); transition: width .2s; }
+  .start-btn { margin-top: 26px; padding: 14px 44px; font-size: clamp(14px, 1.6vw, 18px); font-weight: 600; color: #fff; background: linear-gradient(135deg,#5b8dff,#9b5bff); border: none; border-radius: 40px; cursor: pointer; box-shadow: 0 8px 25px rgba(120,90,255,.4); opacity: 0; transform: translateY(10px); transition: all .5s; }
+  .start-btn.ready { opacity: 1; transform: translateY(0); }
+  .start-btn:hover { transform: translateY(-2px) scale(1.03); }
+
+  .app { position: absolute; inset: 0; display: grid; grid-template-rows: auto auto 1fr; opacity: 0; transition: opacity .6s; }
+  .app.show { opacity: 1; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 10px 22px; background: rgba(10,15,40,.55); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.08); }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .brand-ico { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg,#6ea8ff,#b36eff); display:flex; align-items:center; justify-content:center; }
+  .brand-ico svg { width: 60%; height: 60%; }
+  .brand-text h3 { font-size: clamp(12px, 1.4vw, 17px); font-weight: 700; }
+  .brand-text p { font-size: clamp(9px, 1vw, 12px); color:#9aa3c7; }
+  .sound-toggle { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #fff; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: clamp(10px, 1vw, 13px); display:flex; align-items:center; gap:6px; }
+
+  .tabs { display: flex; gap: 4px; padding: 10px 22px 0; background: rgba(10,15,40,.3); }
+  .tab-btn { flex: 1; padding: 10px 6px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-bottom: none; border-radius: 10px 10px 0 0; color: #b9c3e6; font-size: clamp(10px, 1.1vw, 13px); font-weight: 600; cursor: pointer; transition: all .25s; display:flex; align-items:center; justify-content:center; gap:4px; }
+  .tab-btn:hover { background: rgba(255,255,255,.08); color:#fff; }
+  .tab-btn.active { background: linear-gradient(180deg, rgba(120,160,255,.25), rgba(120,160,255,.05)); color: #fff; border-color: rgba(120,160,255,.4); }
+  .tab-btn .ico { font-size: 1em; }
+
+  .content { position: relative; overflow: hidden; }
+  .pane { position: absolute; inset: 0; padding: 18px 22px; overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .pane.active { opacity: 1; pointer-events: auto; }
+  .pane::-webkit-scrollbar { width: 8px; }
+  .pane::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+
+  h2.pane-title { font-size: clamp(16px, 2vw, 24px); margin-bottom: 12px; background: linear-gradient(90deg,#9ecbff,#d89eff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h3.section-title { font-size: clamp(13px, 1.4vw, 17px); margin: 14px 0 8px; color: #ffd29e; }
+  p, li { font-size: clamp(11px, 1.15vw, 14px); line-height: 1.55; color:#d7dcef; }
+  .card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; backdrop-filter: blur(6px); }
+  .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .tag { display:inline-block; padding: 3px 10px; border-radius: 20px; background: rgba(120,160,255,.15); color: #9ecbff; font-size: 11px; margin-right: 6px; border: 1px solid rgba(120,160,255,.3); }
+  .tag.green { background: rgba(120,255,180,.12); color:#9effc8; border-color: rgba(120,255,180,.3); }
+  .tag.pink { background: rgba(255,120,200,.12); color:#ffb3d9; border-color: rgba(255,120,200,.3); }
+  .tag.yellow { background: rgba(255,210,120,.12); color:#ffd29e; border-color: rgba(255,210,120,.3); }
+  .formula { background: rgba(0,0,0,.3); border-left: 3px solid #b36eff; padding: 10px 14px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: clamp(11px, 1.1vw, 13px); color: #e8d6ff; margin: 8px 0; }
+
+  .sim-wrap { display: grid; grid-template-columns: 1fr 340px; gap: 14px; height: calc(100% - 40px); }
+  @media (max-width: 900px) { .sim-wrap { grid-template-columns: 1fr; height: auto; } }
+  .sim-stage { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+
+  .scene { flex: 1; position: relative; min-height: 220px; border-radius: 12px; overflow: hidden; background: linear-gradient(180deg, #87ceeb 0%, #b0e0e6 50%, #90c77d 50%, #6ba84f 100%); }
+  .sun { position: absolute; top: 8%; right: 8%; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #fff9c4 0%, #ffd54f 50%, transparent 75%); box-shadow: 0 0 50px rgba(255,213,79,.7); animation: sunPulse 4s ease-in-out infinite; }
+  @keyframes sunPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+  .cloud { position: absolute; filter: blur(1px); animation: cloudMove 40s linear infinite; }
+  .cloud.c1 { width: 90px; height: 24px; top: 12%; left: -100px; animation-duration: 55s; }
+  .cloud.c2 { width: 70px; height: 20px; top: 22%; left: -80px; animation-duration: 75s; animation-delay: -25s; }
+  @keyframes cloudMove { to { transform: translateX(calc(100vw + 200px)); } }
+  .house { position: absolute; bottom: 48%; left: 50%; transform: translateX(-50%); width: 140px; height: 100px; opacity: 0.85; z-index: 1; }
+  .fence { position: absolute; bottom: 48%; left: 0; right: 0; height: 20px; background-image: repeating-linear-gradient(90deg, transparent 0, transparent 12px, #8b6f47 12px, #8b6f47 14px, transparent 14px, transparent 26px); z-index: 2; }
+  .grass { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; z-index: 2; }
+  .bench { position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%); width: 200px; height: 45px; z-index: 4; }
+
+  .chars-wrap { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 12% 2%; pointer-events: none; z-index: 5; }
+  .char { display: flex; flex-direction: column; align-items: center; position: relative; animation: charEnter .6s ease-out backwards; }
+  .char.rina-char { animation-delay: .2s; }
+  .char.budi-char { animation-delay: .4s; }
+  @keyframes charEnter { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .emotion-bubble { position: absolute; top: -35px; left: 50%; transform: translateX(-50%) scale(0); background: rgba(255,255,255,.95); border-radius: 50%; width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,.25); transition: transform .3s cubic-bezier(.68,-0.55,.27,1.55); z-index: 7; }
+  .emotion-bubble.show { transform: translateX(-50%) scale(1); }
+
+  .avatar-svg { width: 120px; height: 150px; filter: drop-shadow(0 8px 14px rgba(0,0,0,.35)); }
+  .avatar-body { transform-origin: 50% 100%; animation: breathe 3s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(1.02)} }
+  .avatar-head { transform-origin: 50% 85%; transition: transform .3s; }
+  .char.talking .avatar-head { animation: headTalk 1.5s ease-in-out infinite; }
+  @keyframes headTalk { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+  .eye { transform-origin: center; animation: blink 4s infinite; }
+  @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+
+  .mouth { transition: opacity .08s; }
+  .mouth-default { opacity: 1; }
+  .mouth-a, .mouth-e, .mouth-i, .mouth-o, .mouth-m { opacity: 0; }
+  .char.talking .mouth-default { opacity: 0; }
+  .char.talking .mouth-a { animation: mouthA 0.8s infinite; }
+  .char.talking .mouth-e { animation: mouthE 0.8s infinite 0.16s; }
+  .char.talking .mouth-i { animation: mouthI 0.8s infinite 0.32s; }
+  .char.talking .mouth-o { animation: mouthO 0.8s infinite 0.48s; }
+  .char.talking .mouth-m { animation: mouthM 0.8s infinite 0.64s; }
+  @keyframes mouthA { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
+  @keyframes mouthE { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
+  @keyframes mouthI { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
+  @keyframes mouthO { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
+  @keyframes mouthM { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
+
+  .char-name { margin-top: 6px; font-weight: 700; font-size: 12px; background: rgba(255,255,255,.95); color: #1a2555; padding: 3px 12px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 6; }
+
+  .bubble { position: absolute; background: rgba(255,255,255,.97); color: #1a2555; padding: 10px 14px; border-radius: 14px; font-size: var(--bubble-size, 13px); max-width: 260px; line-height: 1.4; box-shadow: 0 6px 18px rgba(0,0,0,.3); opacity: 0; transform: scale(.6) translateY(10px); transition: all .4s cubic-bezier(.68,-0.55,.27,1.55); z-index: 8; font-weight: 500; }
+  .bubble.show { opacity: 1; transform: scale(1) translateY(0); }
+  .bubble.left { top: 10%; left: 3%; }
+  .bubble.right { top: 10%; right: 3%; }
+
+  .voice-controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; padding: 10px; background: rgba(0,0,0,.2); border-radius: 10px; border: 1px solid rgba(255,255,255,.08); align-items: center; }
+  .voice-controls label { font-size: 11px; color: #b9c3e6; display:flex; align-items:center; gap:6px; }
+  .voice-controls select { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+  .voice-controls select option { background: #1a2555; }
+  .voice-controls input[type="range"] { width: 90px; accent-color: #b36eff; cursor: pointer; }
+  .size-val { font-size: 10px; color: #ffd29e; min-width: 28px; text-align: center; }
+
+  .controls { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .btn { padding: 8px 16px; border: none; border-radius: 20px; font-size: clamp(11px, 1.1vw, 13px); font-weight: 600; cursor: pointer; transition: all .2s; display:inline-flex; align-items:center; gap:6px; }
+  .btn-primary { background: linear-gradient(135deg,#5b8dff,#9b5bff); color:#fff; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(120,90,255,.4); }
+  .btn-ghost { background: rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.15); }
+  .btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,.15); }
+  .btn-success { background: linear-gradient(135deg,#4ade80,#22c55e); color:#fff; }
+  .btn-danger { background: linear-gradient(135deg,#f87171,#ef4444); color:#fff; }
+  .btn-record { background: linear-gradient(135deg,#ef4444,#dc2626); color:#fff; }
+  .btn-record.recording { animation: recPulse 1s infinite; }
+  .btn-demo { background: linear-gradient(135deg,#f59e0b,#d97706); color:#fff; }
+  @keyframes recPulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.6)} 50%{box-shadow:0 0 0 12px rgba(239,68,68,0)} }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+
+  .sim-panel { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; overflow-y: auto; }
+  .progress-row { display:flex; justify-content:space-between; font-size: 12px; color:#b9c3e6; margin-bottom: 6px; }
+  .progress-bar { height: 8px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
+  .progress-bar > div { height:100%; background: linear-gradient(90deg,#6ea8ff,#b36eff); transition: width .4s; }
+  .question-box { flex: 1; background: rgba(255,255,255,.04); border-radius: 10px; padding: 12px; margin-bottom: 10px; overflow-y: auto; }
+  .question-box h4 { font-size: 13px; color: #ffd29e; margin-bottom: 8px; }
+  .question-box p.q-text { font-size: 12px; margin-bottom: 10px; color:#e8ecf8; }
+  .option { display: block; padding: 8px 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; margin-bottom: 6px; cursor: pointer; font-size: 12px; transition: all .2s; }
+  .option:hover { background: rgba(120,160,255,.15); border-color: rgba(120,160,255,.4); }
+  .option.correct { background: rgba(74,222,128,.2); border-color:#4ade80; }
+  .option.wrong { background: rgba(248,113,113,.2); border-color:#f87171; }
+  .feedback { font-size: 12px; padding: 8px 10px; border-radius: 8px; margin-top: 8px; display:none; }
+  .feedback.show { display:block; }
+  .feedback.ok { background: rgba(74,222,128,.15); color:#9effc8; border:1px solid rgba(74,222,128,.3); }
+  .feedback.no { background: rgba(248,113,113,.15); color:#ffb3b3; border:1px solid rgba(248,113,113,.3); }
+  .score-box { background: linear-gradient(135deg, rgba(120,160,255,.15), rgba(179,110,255,.15)); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; padding: 10px; text-align: center; }
+  .score-box .big { font-size: 22px; font-weight: 800; color:#fff; }
+  .score-box .lbl { font-size: 11px; color:#b9c3e6; }
+
+  /* SPEAKING LAB */
+  .speaking-lab { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; height: calc(100% - 40px); }
+  @media (max-width: 900px) { .speaking-lab { grid-template-columns: 1fr; } }
+
+  .speaking-scene { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+
+  .speaking-controls { background: linear-gradient(135deg, rgba(239,68,68,.08), rgba(220,38,38,.05)); border: 1px solid rgba(239,68,68,.25); border-radius: 12px; padding: 14px; margin-top: 10px; }
+  .speaking-controls h4 { font-size: 14px; color: #ffb3b3; margin-bottom: 10px; display:flex; align-items:center; gap:6px; }
+  .speaking-controls label { font-size: 11px; color: #b9c3e6; display:block; margin-bottom: 4px; }
+  .speaking-controls select { width: 100%; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: 8px; font-size: 12px; margin-bottom: 10px; }
+  .speaking-controls select option { background: #1a2555; }
+
+  .target-sentence { background: rgba(0,0,0,.3); padding: 10px 12px; border-radius: 8px; font-size: 13px; color: #fff; margin-bottom: 10px; font-style: italic; border-left: 3px solid #ef4444; line-height: 1.5; }
+
+  .record-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .record-controls .btn { font-size: 12px; padding: 8px 14px; }
+
+  .waveform { width: 100%; height: 60px; background: rgba(0,0,0,.3); border-radius: 8px; margin-bottom: 10px; display: block; }
+
+  .rec-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,.3);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #b9c3e6;
+  }
+  .rec-status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #6b7280;
+    transition: all .3s;
+    flex-shrink: 0;
+  }
+  .rec-status-dot.ready { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+  .rec-status-dot.recording { background: #ef4444; animation: recDotPulse 1s infinite; }
+  .rec-status-dot.error { background: #f59e0b; }
+  .rec-status-dot.demo { background: #a78bfa; animation: recDotPulse 1.5s infinite; }
+  @keyframes recDotPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .protocol-warning {
+    background: linear-gradient(135deg, rgba(245,158,11,.15), rgba(217,119,6,.1));
+    border: 1px solid rgba(245,158,11,.4);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    color: #fbbf24;
+    display: none;
+    line-height: 1.5;
+  }
+  .protocol-warning.show { display: block; }
+
+  .record-result { display: none; background: rgba(0,0,0,.3); border-radius: 10px; padding: 14px; margin-top: 10px; }
+  .record-result.show { display: block; animation: resultIn .5s ease-out; }
+  @keyframes resultIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .metric-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 600px) { .metric-cards { grid-template-columns: 1fr; } }
+
+  .metric-card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all .3s;
+  }
+  .metric-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.2); }
+  .metric-card::before {
+    content:"";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-color, #4ade80);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .6s;
+  }
+  .metric-card.animated::before { transform: scaleX(1); }
+
+  .metric-icon {
+    font-size: 28px;
+    margin-bottom: 6px;
+    display: block;
+    animation: iconBounce 2s ease-in-out infinite;
+  }
+  @keyframes iconBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+  .metric-label {
+    font-size: 10px;
+    color: #9aa3c7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-bar-container {
+    height: 6px;
+    background: rgba(255,255,255,.08);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .metric-bar-fill {
+    height: 100%;
+    background: var(--card-color, #4ade80);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+    position: relative;
+  }
+  .metric-bar-fill::after {
+    content:"";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+  @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+  .metric-feedback {
+    font-size: 10px;
+    color: var(--card-color, #4ade80);
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  .overall-score {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(120,160,255,.15), rgba(179,110,255,.15));
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .score-circle {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    font-weight: 800; color: #fff; position: relative; flex-shrink: 0;
+    background: conic-gradient(var(--score-color) var(--score-pct), rgba(255,255,255,.1) 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff calc(100% - 5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff calc(100% - 5px));
+    animation: scoreRotate 1s ease-out;
+  }
+  @keyframes scoreRotate { from { transform: rotate(-90deg); } to { transform: rotate(0); } }
+  .score-circle-inner {
+    position: absolute; inset: 6px;
+    background: rgba(10,15,40,.9);
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    -webkit-mask: none;
+    mask: none;
+  }
+  .score-circle .pct { font-size: 24px; line-height: 1; }
+  .score-circle .lbl { font-size: 10px; opacity:.8; margin-top: 2px; }
+  .overall-info h5 { font-size: 15px; color: #fff; margin-bottom: 4px; }
+  .overall-info p { font-size: 12px; color: #b9c3e6; line-height: 1.4; }
+
+  .transcript-box { background: rgba(255,255,255,.05); border-radius: 8px; padding: 10px; margin: 8px 0; font-size: 12px; }
+  .transcript-box .label { color: #9aa3c7; font-size: 11px; margin-bottom: 4px; }
+  .transcript-box .text { color: #fff; line-height: 1.5; }
+
+  .feedback-text { font-size: 13px; padding: 12px; border-radius: 8px; margin-top: 10px; line-height: 1.6; }
+  .feedback-text.excellent { background: rgba(74,222,128,.15); color:#9effc8; border:1px solid rgba(74,222,128,.3); }
+  .feedback-text.good { background: rgba(120,160,255,.15); color:#9ecbff; border:1px solid rgba(120,160,255,.3); }
+  .feedback-text.fair { background: rgba(255,210,120,.15); color:#ffd29e; border:1px solid rgba(255,210,120,.3); }
+  .feedback-text.poor { background: rgba(248,113,113,.15); color:#ffb3b3; border:1px solid rgba(248,113,113,.3); }
+
+  .lkpd-q { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+  .lkpd-q label { display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#ffd29e; }
+  .lkpd-q textarea, .lkpd-q input[type=text] { width: 100%; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; padding: 8px 10px; color: #fff; font-family: inherit; font-size: 12px; resize: vertical; }
+  .lkpd-q textarea:focus, .lkpd-q input:focus { outline: none; border-color: #6ea8ff; }
+  .lkpd-q textarea { min-height: 60px; }
+  .mc-opt { display:flex; align-items:center; gap:8px; padding: 6px 10px; background: rgba(255,255,255,.04); border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: 12px; }
+  .mc-opt input { accent-color: #6ea8ff; }
+  .result-banner { padding: 10px 14px; border-radius: 10px; background: linear-gradient(135deg, rgba(74,222,128,.2), rgba(34,197,94,.2)); border: 1px solid rgba(74,222,128,.3); color: #9effc8; font-size: 13px; display: none; margin-top: 10px; }
+  .result-banner.show { display:block; }
+
+  .dev-card { display: flex; gap: 16px; align-items: center; background: rgba(255,255,255,.04); border-radius: 14px; padding: 18px; border: 1px solid rgba(255,255,255,.08); }
+  .dev-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg,#6ea8ff,#b36eff); display:flex; align-items:center; justify-content:center; font-size: 32px; font-weight: 800; color:#fff; flex-shrink: 0; }
+  .dev-info h3 { font-size: 18px; color:#fff; margin-bottom: 4px; }
+  .dev-info p { font-size: 12px; color:#b9c3e6; }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 10px; margin-top: 14px; }
+  .info-item { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 10px 12px; }
+  .info-item .k { font-size: 11px; color:#9aa3c7; }
+  .info-item .v { font-size: 13px; color:#fff; font-weight: 600; margin-top: 2px; }
+
+  .toast { position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: rgba(20,25,60,.95); border: 1px solid rgba(255,255,255,.15); padding: 10px 18px; border-radius: 30px; font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,.4); transition: transform .4s; z-index: 200; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    .tabs { padding: 6px 10px 0; gap: 2px; }
+    .tab-btn { padding: 8px 4px; font-size: 9px; }
+    .tab-btn .ico { display:none; }
+    header { padding: 8px 12px; }
+    .pane { padding: 12px; }
+    .avatar-svg { width: 85px; height: 110px; }
+    .bubble { max-width: 160px; }
+    .chars-wrap { padding: 0 6% 2%; }
+    .bench { width: 140px; }
+    .house { width: 100px; height: 75px; }
+    .speaking-lab { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="frame" id="frame">
+
+    <div class="splash" id="splash">
+      <div class="splash-logo">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h1>Virtual Lab: Exposition Text</h1>
+      <h2>Discussing a Friend's Problem in Using Social Media</h2>
+      <div class="sub">Listening &amp; Speaking • SMA Fase F (Kelas XII) • SIBI</div>
+      <div class="loadbar"><div id="loadFill"></div></div>
+      <button class="start-btn" id="startBtn" type="button">▶ Mulai Belajar</button>
+    </div>
+
+    <div class="app" id="app">
+      <header>
+        <div class="brand">
+          <div class="brand-ico">
+            <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="brand-text">
+            <h3>Lab Maya Bahasa Inggris</h3>
+            <p>Exposition Text • Social Media Problem</p>
+          </div>
+        </div>
+        <button class="sound-toggle" id="soundToggle" type="button">🔊 Suara: ON</button>
+      </header>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="teori" type="button"><span class="ico">📘</span>Teori</button>
+        <button class="tab-btn" data-tab="prosedur" type="button"><span class="ico">📋</span>Prosedur</button>
+        <button class="tab-btn" data-tab="simulasi" type="button"><span class="ico">🧪</span>Simulasi</button>
+        <button class="tab-btn" data-tab="speaking" type="button"><span class="ico">🎤</span>Speaking Lab</button>
+        <button class="tab-btn" data-tab="lkpd" type="button"><span class="ico">📝</span>LKPD</button>
+        <button class="tab-btn" data-tab="pengembang" type="button"><span class="ico">👨‍🏫</span>Pengembang</button>
+      </div>
+
+      <div class="content">
+
+        <!-- TAB 1: TEORI -->
+        <div class="pane active" id="pane-teori">
+          <h2 class="pane-title">📘 Ringkasan Materi</h2>
+          <div class="card">
+            <h3 class="section-title">1. Apa itu Exposition Text?</h3>
+            <p>Teks eksposisi adalah teks yang bertujuan untuk <b>meyakinkan pembaca</b> bahwa suatu isu penting untuk dibahas, dengan memberikan serangkaian argumen pendukung.</p>
+            <div class="grid-2" style="margin-top:10px;">
+              <div><span class="tag green">Analytical</span><p style="margin-top:6px;">Berusaha <b>menjelaskan</b> bahwa sesuatu <i>benar terjadi</i>. Diakhiri dengan <b>reiteration</b>.</p></div>
+              <div><span class="tag pink">Hortatory</span><p style="margin-top:6px;">Berusaha <b>membujuk</b> pembaca untuk <i>melakukan sesuatu</i>. Diakhiri dengan <b>recommendation</b>.</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">2. Generic Structure</h3>
+            <div class="formula">1. <b>Thesis</b> → pengenalan isu &amp; posisi penulis<br>2. <b>Arguments</b> → poin-poin pendukung<br>3. <b>Reiteration / Recommendation</b> → kesimpulan atau ajakan</div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">3. Language Features</h3>
+            <ul style="padding-left:18px;">
+              <li>Menggunakan <b>Simple Present Tense</b></li>
+              <li>Menggunakan <b>thinking verbs</b>: <i>believe, realize, agree</i></li>
+              <li>Menggunakan <b>connectors</b>: <i>firstly, moreover, in addition, therefore</i></li>
+              <li>Menggunakan <b>modals</b>: <i>should, must, ought to</i></li>
+              <li>Menggunakan <b>evaluative words</b>: <i>important, valuable, dangerous</i></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="section-title">4. Expressions (Listening &amp; Speaking Focus)</h3>
+            <div class="grid-2">
+              <div><span class="tag">Asking Opinion</span><p style="margin-top:6px;font-size:12px;">• What do you think about…?<br>• Do you have any idea?<br>• How do you feel about…?</p></div>
+              <div><span class="tag green">Giving Opinion</span><p style="margin-top:6px;font-size:12px;">• I personally believe that…<br>• In my opinion,…<br>• From my point of view,…</p></div>
+              <div><span class="tag yellow">Agreeing</span><p style="margin-top:6px;font-size:12px;">• I totally agree with you.<br>• That's a good point.<br>• You're absolutely right.</p></div>
+              <div><span class="tag pink">Disagreeing</span><p style="margin-top:6px;font-size:12px;">• I see your point, but…<br>• I'm not sure I agree.<br>• I beg to differ.</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">5. Contoh Singkat (Topik: Social Media)</h3>
+            <div class="formula"><b>Thesis:</b> Social media addiction among teenagers has become a serious issue that needs attention.<br><br><b>Argument 1:</b> Firstly, excessive use of social media reduces students' focus on studying.<br><b>Argument 2:</b> Moreover, it can cause sleep deprivation and anxiety.<br><br><b>Recommendation:</b> Therefore, teenagers should limit their daily screen time and prioritize real-life interactions.</div>
+          </div>
+        </div>
+
+        <!-- TAB 2: PROSEDUR -->
+        <div class="pane" id="pane-prosedur">
+          <h2 class="pane-title">📋 Prosedur Praktikum</h2>
+          <div class="card">
+            <h3 class="section-title">A. Tujuan Pembelajaran</h3>
+            <p>Siswa mampu <b>menyimak</b> dialog, <b>merespons</b> dengan ekspresi yang tepat, serta <b>berlatih pronunciation, fluency, dan pace</b> dengan berbagai aksen (UK/US) dan gender (Male/Female).</p>
+          </div>
+          <div class="card">
+            <h3 class="section-title">B. Langkah-Langkah Simulasi</h3>
+            <ol style="padding-left:18px; line-height:1.8;">
+              <li>Buka tab <b>🧪 Simulasi</b> untuk mendengarkan dialog &amp; menjawab quiz.</li>
+              <li>Pilih <b>Aksen</b>, <b>Gender Suara</b>, dan <b>Ukuran Dialog</b>.</li>
+              <li>Tekan <b>▶ Play Dialog</b> – perhatikan animasi bibir realistis &amp; scene taman!</li>
+              <li>Buka tab <b>🎤 Speaking Lab</b> untuk berlatih speaking dengan analisis 5 metrik.</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3 class="section-title">C. Fitur Speaking Lab</h3>
+            <ul style="padding-left:18px; line-height:1.8;">
+              <li>🎯 <b>Pronunciation</b> – ketepatan pengucapan kata</li>
+              <li>💬 <b>Fluency</b> – kelancaran &amp; minimnya jeda/hesitation</li>
+              <li>⏱️ <b>Pace (WPM)</b> – kecepatan bicara ideal (100-160 WPM)</li>
+              <li>🎚️ <b>Confidence</b> – keyakinan sistem terhadap ucapanmu</li>
+              <li>✅ <b>Completeness</b> – kelengkapan kata yang terucap</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="section-title">D. Tips Sukses</h3>
+            <ul style="padding-left:18px; line-height:1.8;">
+              <li>🎧 Dengarkan dialog minimal <b>2 kali</b>.</li>
+              <li>🎤 Ucapkan kalimat dengan <b>jelas, pelan, dan natural</b>.</li>
+              <li>🌍 Bandingkan aksen UK dan US untuk melatih pendengaran.</li>
+              <li>⏱️ Jaga kecepatan bicara sekitar <b>120-140 kata/menit</b>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- TAB 3: SIMULASI -->
+        <div class="pane" id="pane-simulasi">
+          <h2 class="pane-title">🧪 Simulasi Interaktif</h2>
+          <div class="sim-wrap">
+            <div class="sim-stage">
+              <div class="scene" id="scene">
+                <div class="sun"></div>
+                <svg class="cloud c1" viewBox="0 0 90 24"><ellipse cx="20" cy="14" rx="16" ry="10" fill="#fff" opacity=".9"/><ellipse cx="40" cy="12" rx="20" ry="12" fill="#fff" opacity=".95"/><ellipse cx="65" cy="14" rx="18" ry="10" fill="#fff" opacity=".9"/></svg>
+                <svg class="cloud c2" viewBox="0 0 70 20"><ellipse cx="15" cy="12" rx="12" ry="8" fill="#fff" opacity=".9"/><ellipse cx="35" cy="10" rx="16" ry="10" fill="#fff" opacity=".95"/><ellipse cx="55" cy="12" rx="12" ry="8" fill="#fff" opacity=".9"/></svg>
+                <svg class="house" viewBox="0 0 140 100"><polygon points="10,45 70,10 130,45" fill="#a0522d"/><rect x="20" y="45" width="100" height="55" fill="#f4e4c1"/><rect x="60" y="65" width="20" height="35" fill="#6b4423"/><rect x="30" y="55" width="18" height="18" fill="#87ceeb" stroke="#6b4423" stroke-width="2"/><rect x="92" y="55" width="18" height="18" fill="#87ceeb" stroke="#6b4423" stroke-width="2"/></svg>
+                <div class="fence"></div>
+                <div class="grass"></div>
+                <svg class="bench" viewBox="0 0 200 45"><rect x="10" y="5" width="180" height="6" rx="2" fill="#8b6f47"/><rect x="10" y="13" width="180" height="6" rx="2" fill="#8b6f47"/><rect x="5" y="22" width="190" height="8" rx="2" fill="#a0825a"/><rect x="15" y="30" width="6" height="15" fill="#6b4423"/><rect x="179" y="30" width="6" height="15" fill="#6b4423"/><rect x="95" y="30" width="6" height="15" fill="#6b4423"/></svg>
+                <div class="bubble left" id="bubbleLeft">Hi…</div>
+                <div class="bubble right" id="bubbleRight">Hello…</div>
+                <div class="chars-wrap">
+                  <div class="char rina-char" id="charRina">
+                    <div class="emotion-bubble" id="emoRina">😊</div>
+                    <svg class="avatar-svg" viewBox="0 0 120 150">
+                      <g class="avatar-body"><path d="M 32 100 Q 60 90 88 100 L 93 150 L 27 150 Z" fill="#ff7ab6"/><rect x="52" y="82" width="16" height="12" fill="#f4c9a0"/></g>
+                      <g class="avatar-head">
+                        <path d="M 28 48 Q 28 22 60 20 Q 92 22 92 48 L 92 80 Q 87 75 82 77 L 82 53 Q 60 43 38 53 L 38 77 Q 33 75 28 80 Z" fill="#4a2c1a"/>
+                        <ellipse cx="60" cy="58" rx="27" ry="30" fill="#f4c9a0"/>
+                        <path d="M 33 43 Q 38 27 60 25 Q 82 27 87 43 Q 82 38 72 39 Q 60 32 48 39 Q 38 38 33 43 Z" fill="#4a2c1a"/>
+                        <g class="eye"><ellipse cx="49" cy="58" rx="3.5" ry="4.5" fill="#2c1810"/><circle cx="49.5" cy="57" r="1.2" fill="#fff"/></g>
+                        <g class="eye"><ellipse cx="71" cy="58" rx="3.5" ry="4.5" fill="#2c1810"/><circle cx="71.5" cy="57" r="1.2" fill="#fff"/></g>
+                        <path class="mouth mouth-default" d="M 52 75 Q 60 78 68 75" stroke="#c44569" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <ellipse class="mouth mouth-a" cx="60" cy="76" rx="6" ry="4" fill="#8b2c4a"/>
+                        <ellipse class="mouth mouth-e" cx="60" cy="76" rx="5" ry="2.5" fill="#8b2c4a"/>
+                        <path class="mouth mouth-i" d="M 50 75 Q 60 80 70 75" stroke="#c44569" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <ellipse class="mouth mouth-o" cx="60" cy="76" rx="3.5" ry="3.5" fill="#8b2c4a"/>
+                        <path class="mouth mouth-m" d="M 52 76 L 68 76" stroke="#c44569" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      </g>
+                    </svg>
+                    <div class="char-name">Rina</div>
+                  </div>
+                  <div class="char budi-char" id="charBudi">
+                    <div class="emotion-bubble" id="emoBudi">😊</div>
+                    <svg class="avatar-svg" viewBox="0 0 120 150">
+                      <g class="avatar-body"><path d="M 30 100 Q 60 90 90 100 L 96 150 L 24 150 Z" fill="#6ea8ff"/><rect x="52" y="82" width="16" height="12" fill="#e8b890"/></g>
+                      <g class="avatar-head">
+                        <path d="M 30 45 Q 32 22 60 20 Q 88 22 90 45 L 90 58 Q 86 48 78 48 L 78 41 Q 60 35 42 41 L 42 48 Q 34 48 30 58 Z" fill="#2c1810"/>
+                        <ellipse cx="60" cy="58" rx="27" ry="30" fill="#e8b890"/>
+                        <path d="M 38 38 Q 48 30 60 32 Q 72 30 82 38 Q 77 35 67 36 Q 53 35 38 38 Z" fill="#2c1810"/>
+                        <g class="eye"><ellipse cx="49" cy="58" rx="3.5" ry="4.5" fill="#1a0f08"/><circle cx="49.5" cy="57" r="1.2" fill="#fff"/></g>
+                        <g class="eye"><ellipse cx="71" cy="58" rx="3.5" ry="4.5" fill="#1a0f08"/><circle cx="71.5" cy="57" r="1.2" fill="#fff"/></g>
+                        <path class="mouth mouth-default" d="M 52 76 Q 60 79 68 76" stroke="#8b4513" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <ellipse class="mouth mouth-a" cx="60" cy="77" rx="6" ry="4" fill="#5c2a0e"/>
+                        <ellipse class="mouth mouth-e" cx="60" cy="77" rx="5" ry="2.5" fill="#5c2a0e"/>
+                        <path class="mouth mouth-i" d="M 50 76 Q 60 81 70 76" stroke="#8b4513" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <ellipse class="mouth mouth-o" cx="60" cy="77" rx="3.5" ry="3.5" fill="#5c2a0e"/>
+                        <path class="mouth mouth-m" d="M 52 77 L 68 77" stroke="#8b4513" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      </g>
+                    </svg>
+                    <div class="char-name">Budi</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="voice-controls">
+                <label>🗣️ Aksen:<select id="accentSel"><option value="en-US">🇺🇸 American</option><option value="en-GB">🇬🇧 British</option></select></label>
+                <label>🎭 Gender:<select id="genderSel"><option value="female">♀ Female</option><option value="male">♂ Male</option></select></label>
+                <label>🔤 Ukuran Dialog:<input type="range" id="bubbleSize" min="10" max="20" value="13" step="1" /><span class="size-val" id="sizeVal">13px</span></label>
+              </div>
+
+              <div class="controls">
+                <button class="btn btn-primary" id="playBtn" type="button">▶ Play Dialog</button>
+                <button class="btn btn-ghost" id="stopBtn" type="button">⏹ Stop</button>
+                <button class="btn btn-danger" id="resetBtn" type="button">🔄 Reset</button>
+              </div>
+            </div>
+
+            <div class="sim-panel">
+              <div class="progress-row"><span>Progress Quiz</span><span id="progText">0 / 5</span></div>
+              <div class="progress-bar"><div id="progFill" style="width:0%"></div></div>
+              <div class="question-box" id="qBox">
+                <h4>📢 Soal Interaktif</h4>
+                <p class="q-text" id="qText">Tekan <b>Play Dialog</b> untuk memulai simulasi.</p>
+                <div id="options"></div>
+                <div class="feedback" id="feedback"></div>
+              </div>
+              <div class="score-box"><div class="lbl">Skor Quiz</div><div class="big" id="scoreVal">0</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: SPEAKING LAB -->
+        <div class="pane" id="pane-speaking">
+          <h2 class="pane-title">🎤 Speaking Lab – Multi-Metric Analysis</h2>
+          <div class="speaking-lab">
+            <div class="speaking-scene">
+              <div class="scene" style="min-height: 180px;">
+                <div class="sun" style="width: 40px; height: 40px; top: 10%; right: 10%;"></div>
+                <svg class="cloud c1" style="top: 15%; animation-duration: 40s;" viewBox="0 0 90 24"><ellipse cx="20" cy="14" rx="16" ry="10" fill="#fff" opacity=".9"/><ellipse cx="40" cy="12" rx="20" ry="12" fill="#fff" opacity=".95"/><ellipse cx="65" cy="14" rx="18" ry="10" fill="#fff" opacity=".9"/></svg>
+                <div class="chars-wrap" style="padding: 0 20% 5%;">
+                  <div class="char rina-char" id="charRinaSpeak">
+                    <div class="emotion-bubble" id="emoRinaSpeak"></div>
+                    <svg class="avatar-svg" viewBox="0 0 120 150" style="width: 100px; height: 125px;">
+                      <g class="avatar-body"><path d="M 32 100 Q 60 90 88 100 L 93 150 L 27 150 Z" fill="#ff7ab6"/><rect x="52" y="82" width="16" height="12" fill="#f4c9a0"/></g>
+                      <g class="avatar-head">
+                        <path d="M 28 48 Q 28 22 60 20 Q 92 22 92 48 L 92 80 Q 87 75 82 77 L 82 53 Q 60 43 38 53 L 38 77 Q 33 75 28 80 Z" fill="#4a2c1a"/>
+                        <ellipse cx="60" cy="58" rx="27" ry="30" fill="#f4c9a0"/>
+                        <path d="M 33 43 Q 38 27 60 25 Q 82 27 87 43 Q 82 38 72 39 Q 60 32 48 39 Q 38 38 33 43 Z" fill="#4a2c1a"/>
+                        <g class="eye"><ellipse cx="49" cy="58" rx="3.5" ry="4.5" fill="#2c1810"/><circle cx="49.5" cy="57" r="1.2" fill="#fff"/></g>
+                        <g class="eye"><ellipse cx="71" cy="58" rx="3.5" ry="4.5" fill="#2c1810"/><circle cx="71.5" cy="57" r="1.2" fill="#fff"/></g>
+                        <path class="mouth mouth-default" d="M 52 75 Q 60 78 68 75" stroke="#c44569" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <ellipse class="mouth mouth-a" cx="60" cy="76" rx="6" ry="4" fill="#8b2c4a"/>
+                        <ellipse class="mouth mouth-e" cx="60" cy="76" rx="5" ry="2.5" fill="#8b2c4a"/>
+                        <path class="mouth mouth-i" d="M 50 75 Q 60 80 70 75" stroke="#c44569" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <ellipse class="mouth mouth-o" cx="60" cy="76" rx="3.5" ry="3.5" fill="#8b2c4a"/>
+                        <path class="mouth mouth-m" d="M 52 76 L 68 76" stroke="#c44569" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      </g>
+                    </svg>
+                    <div class="char-name">You</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="speaking-controls">
+                <h4>🎙️ Practice Speaking</h4>
+                <label>Pilih kalimat untuk dilatih:</label>
+                <select id="practiceSel"></select>
+                <div class="target-sentence" id="targetSentence">Pilih kalimat di atas...</div>
+
+                <div class="protocol-warning" id="protocolWarning">ℹ️ <b>File dibuka dari file://</b><br>Chrome/Edge biasanya tetap meminta izin mikrofon; jika diblokir, buka lewat <b>localhost/HTTPS</b> (mis. upload ke GitHub Pages/Netlify). Tombol <b>🧪 Demo Mode</b> tetap bisa dipakai untuk contoh.</div>
+
+                <div class="rec-status">
+                  <div class="rec-status-dot" id="recStatusDot"></div>
+                  <span id="recStatusText">Klik "Rekam" untuk mulai</span>
+                </div>
+
+                <div class="record-controls">
+                  <button class="btn btn-primary" id="listenExampleBtn" type="button">🔊 Dengarkan Contoh</button>
+                  <button class="btn btn-record" id="recordBtn" type="button">🎤 Rekam</button>
+                  <button class="btn btn-demo" id="demoBtn" type="button">🧪 Demo Mode</button>
+                  <button class="btn btn-ghost" id="playRecBtn" type="button" disabled>▶ Putar Rekaman</button>
+                </div>
+                <canvas class="waveform" id="waveform" width="400" height="60"></canvas>
+              </div>
+            </div>
+
+            <div class="sim-panel" style="overflow-y: auto;">
+              <div id="noResult" style="text-align: center; padding: 40px 20px; color: #9aa3c7;">
+                <div style="font-size: 48px; margin-bottom: 10px;">🎤</div>
+                <p style="font-size: 14px;">Mulai merekam untuk melihat analisis speaking kamu!</p>
+                <p style="font-size: 11px; margin-top: 8px; opacity: 0.7;">💡 Tips: Bicara jelas &amp; natural<br>🧪 Atau coba <b>Demo Mode</b> untuk melihat contoh hasil</p>
+              </div>
+
+              <div class="record-result" id="recordResult">
+                <div class="overall-score">
+                  <div class="score-circle" id="scoreCircle" style="--score-pct:0%; --score-color:#4ade80;">
+                    <div class="score-circle-inner">
+                      <div class="pct" id="scorePct">0%</div>
+                      <div class="lbl">Overall</div>
+                    </div>
+                  </div>
+                  <div class="overall-info">
+                    <h5 id="overallGrade">Analyzing...</h5>
+                    <p id="overallDesc">Wait for the result.</p>
+                  </div>
+                </div>
+
+                <div class="metric-cards">
+                  <div class="metric-card" id="cardPron" style="--card-color:#4ade80;">
+                    <span class="metric-icon">🎯</span>
+                    <div class="metric-label">Pronunciation</div>
+                    <div class="metric-value" id="mPron">0%</div>
+                    <div class="metric-bar-container"><div class="metric-bar-fill" id="mPronBar"></div></div>
+                    <div class="metric-feedback" id="mPronFb">-</div>
+                  </div>
+                  <div class="metric-card" id="cardFlu" style="--card-color:#6ea8ff;">
+                    <span class="metric-icon">💬</span>
+                    <div class="metric-label">Fluency</div>
+                    <div class="metric-value" id="mFlu">0%</div>
+                    <div class="metric-bar-container"><div class="metric-bar-fill" id="mFluBar"></div></div>
+                    <div class="metric-feedback" id="mFluFb">-</div>
+                  </div>
+                  <div class="metric-card" id="cardPace" style="--card-color:#b36eff;">
+                    <span class="metric-icon">⏱️</span>
+                    <div class="metric-label">Pace</div>
+                    <div class="metric-value" id="mPace">0</div>
+                    <div class="metric-bar-container"><div class="metric-bar-fill" id="mPaceBar"></div></div>
+                    <div class="metric-feedback" id="mPaceFb">WPM</div>
+                  </div>
+                </div>
+
+                <div class="transcript-box">
+                  <div class="label">📝 Target:</div>
+                  <div class="text" id="targetTranscript">-</div>
+                </div>
+                <div class="transcript-box">
+                  <div class="label">🎙️ Yang kamu ucapkan:</div>
+                  <div class="text" id="userTranscript">-</div>
+                </div>
+                <div class="feedback-text" id="pronFeedback"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: LKPD -->
+        <div class="pane" id="pane-lkpd">
+          <h2 class="pane-title">📝 Lembar Kerja Peserta Didik</h2>
+          <div class="lkpd-q"><label>1. Nama / Kelas</label><input type="text" id="lkpd1" placeholder="Contoh: Andi / XII IPA 2" /></div>
+          <div class="lkpd-q"><label>2. Tuliskan kembali masalah yang dialami Rina dalam 2–3 kalimat!</label><textarea id="lkpd2" placeholder="Rina mengalami masalah karena…"></textarea></div>
+          <div class="lkpd-q">
+            <label>3. Pilih jawaban yang benar</label>
+            <p style="font-size:12px; margin-bottom:6px; color:#d7dcef;">Which expression shows <b>giving opinion</b>?</p>
+            <label class="mc-opt"><input type="radio" name="mc1" value="a"> a. What do you think about it?</label>
+            <label class="mc-opt"><input type="radio" name="mc1" value="b"> b. I personally believe that social media is harmful.</label>
+            <label class="mc-opt"><input type="radio" name="mc1" value="c"> c. I totally agree with you.</label>
+            <label class="mc-opt"><input type="radio" name="mc1" value="d"> d. Do you have any idea?</label>
+          </div>
+          <div class="lkpd-q"><label>4. Susunlah analytical exposition text singkat (3 paragraf) tentang dampak media sosial bagi pelajar!</label><textarea id="lkpd4" style="min-height:120px;" placeholder="Thesis: ...&#10;Argument: ...&#10;Reiteration: ..."></textarea></div>
+          <div class="lkpd-q"><label>5. Refleksi Diri</label><p style="font-size:12px; margin-bottom:6px; color:#d7dcef;">Apa yang kamu pelajari? Bagian mana yang masih perlu dilatih?</p><textarea id="lkpd5" placeholder="Saya belajar bahwa…"></textarea></div>
+          <button class="btn btn-success" id="submitLkpd" type="button">💾 Simpan &amp; Cek Jawaban</button>
+          <button class="btn btn-ghost" id="clearLkpd" type="button">🗑️ Bersihkan</button>
+          <div class="result-banner" id="lkpdResult"></div>
+        </div>
+
+        <!-- TAB 6: PENGEMBANG -->
+        <div class="pane" id="pane-pengembang">
+          <h2 class="pane-title">👨‍🏫 Profil Pengembang</h2>
+          <div class="dev-card">
+            <div class="dev-avatar">KB</div>
+            <div class="dev-info">
+              <h3>Komang Budiadnya</h3>
+              <p>Guru Bahasa Inggris SMA • Pengembang Media Pembelajaran Interaktif</p>
+              <p style="margin-top:4px;"><i>"Membangun kelas yang menyenangkan melalui teknologi."</i></p>
+            </div>
+          </div>
+          <div class="info-grid">
+            <div class="info-item"><div class="k">Mata Pelajaran</div><div class="v">Bahasa Inggris</div></div>
+            <div class="info-item"><div class="k">Jenjang</div><div class="v">SMA Fase F (Kelas XII)</div></div>
+            <div class="info-item"><div class="k">Topik</div><div class="v">Exposition Text</div></div>
+            <div class="info-item"><div class="k">Keterampilan</div><div class="v">Listening &amp; Speaking</div></div>
+            <div class="info-item"><div class="k">Sumber Belajar</div><div class="v">SIBI – Sistem Informasi Perbukuan Indonesia</div></div>
+            <div class="info-item"><div class="k">Versi Aplikasi</div><div class="v">3.5.0 (Oktober 2026)</div></div>
+            <div class="info-item"><div class="k">Fitur Baru</div><div class="v">Fixed Recording + Robust Error Handling</div></div>
+            <div class="info-item"><div class="k">Teknologi</div><div class="v">HTML5, CSS3, JS, SVG, Web Audio, SpeechSynthesis, MediaRecorder, SpeechRecognition</div></div>
+          </div>
+          <div class="card" style="margin-top:14px;">
+            <h3 class="section-title">📖 Referensi</h3>
+            <p>Buku Paket Bahasa Inggris Kelas XII – Kemendikbudristek melalui <b>SIBI</b>. Unit 2: Exposition Text – Discussing a Friend's Problem in Using Social Media.</p>
+          </div>
+          <div class="card">
+            <h3 class="section-title">💡 Catatan Penggunaan</h3>
+            <p>Aplikasi berjalan <b>100% offline</b> untuk dialog &amp; quiz. Fitur pronunciation &amp; fluency scoring menggunakan <i>SpeechRecognition API</i> (butuh koneksi internet pertama kali). Disarankan menggunakan <b>Chrome / Edge</b>.</p>
+            <p style="margin-top:8px;"><b>⚠️ Penting:</b> Untuk fitur recording penuh, buka file via <b>localhost</b> atau <b>HTTPS</b>. Dari file://, gunakan <b>Demo Mode</b>.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Notifikasi</div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   AUDIO ENGINE + SPEECH
+   Catatan: objek ini bernama SFX (bukan Audio) agar tidak
+   menimpa konstruktor Audio bawaan browser.
+   ========================================================= */
+const SFX = (() => {
+  let ctx = null;
+  let enabled = true;
+  let voices = [];
+
+  function ensure() {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { ctx = null; } }
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
+  }
+
+  function beep(freq = 600, dur = 0.08, type = 'sine', vol = 0.15) {
+    if (!enabled) return;
+    ensure(); if (!ctx) return;
+    try {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g); g.connect(ctx.destination);
+      const t = ctx.currentTime;
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.start(t); o.stop(t + dur);
+    } catch(e) { /* ignore */ }
+  }
+
+  function click()   { beep(800, 0.05, 'square', 0.08); }
+  function success() { beep(660, 0.1, 'sine', 0.15); setTimeout(()=>beep(880,0.15,'sine',0.15),110); }
+  function error()   { beep(220, 0.15, 'sawtooth', 0.12); setTimeout(()=>beep(180,0.2,'sawtooth',0.12),150); }
+  function start()   {
+    beep(523,0.1,'sine',0.15);
+    setTimeout(()=>beep(659,0.1,'sine',0.15),110);
+    setTimeout(()=>beep(784,0.18,'sine',0.15),220);
+  }
+  function notify()  { beep(1000,0.08,'triangle',0.12); setTimeout(()=>beep(1400,0.1,'triangle',0.12),90); }
+
+  function loadVoices() {
+    if (!('speechSynthesis' in window)) return;
+    voices = window.speechSynthesis.getVoices();
+  }
+  if ('speechSynthesis' in window) {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function pickVoice(accent, gender) {
+    if (!voices.length) loadVoices();
+    const lang = accent || 'en-US';
+    const g = (gender || 'female').toLowerCase();
+    let candidates = voices.filter(v => v.lang === lang);
+    if (!candidates.length) candidates = voices.filter(v => v.lang.startsWith(lang.split('-')[0]));
+    if (!candidates.length) candidates = voices.filter(v => v.lang.startsWith('en'));
+    if (!candidates.length) candidates = voices;
+
+    const femaleKeys = ['female', 'woman', 'zira', 'hazel', 'susan', 'karen', 'serena', 'fiona', 'moira', 'tessa', 'victoria', 'samantha', 'allison', 'ava', 'google uk english female'];
+    const maleKeys = ['male', 'man', 'david', 'mark', 'george', 'daniel', 'oliver', 'james', 'google uk english male'];
+
+    const scoreVoice = (v) => {
+      const name = v.name.toLowerCase();
+      if (g === 'female') {
+        if (femaleKeys.some(k => name.includes(k))) return 2;
+        if (maleKeys.some(k => name.includes(k))) return 0;
+        return 1;
+      } else {
+        if (maleKeys.some(k => name.includes(k))) return 2;
+        if (femaleKeys.some(k => name.includes(k))) return 0;
+        return 1;
+      }
+    };
+    candidates.sort((a, b) => scoreVoice(b) - scoreVoice(a));
+    return candidates[0] || null;
+  }
+
+  function speak(text, onEnd, opts = {}) {
+    if (!enabled || !('speechSynthesis' in window)) { if (onEnd) setTimeout(onEnd, 300); return; }
+    try { window.speechSynthesis.cancel(); } catch(e) {}
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = opts.accent || 'en-US';
+    u.rate = opts.rate || 0.95;
+    u.pitch = opts.pitch || 1;
+    const voice = pickVoice(opts.accent, opts.gender);
+    if (voice) u.voice = voice;
+    let ended = false;
+    if (onEnd) u.onend = () => { if (!ended) { ended = true; onEnd(); } };
+    u.onerror = () => { if (onEnd && !ended) { ended = true; onEnd(); } };
+    window.speechSynthesis.speak(u);
+  }
+  function stopSpeak() { if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch(e){} } }
+
+  function toggle() { enabled = !enabled; return enabled; }
+  return { click, success, error, start, notify, speak, stopSpeak, toggle };
+})();
+
+/* =========================================================
+   PROTOCOL DETECTION
+   ========================================================= */
+const isFileProtocol = window.location.protocol === 'file:';
+const protocolWarning = document.getElementById('protocolWarning');
+
+if (isFileProtocol) {
+  protocolWarning.classList.add('show');
+  console.warn('⚠️ File dibuka dari file:// - Mikrofon mungkin diblokir browser');
+}
+
+/* =========================================================
+   SPLASH
+   ========================================================= */
+const splash = document.getElementById('splash');
+const loadFill = document.getElementById('loadFill');
+const startBtn = document.getElementById('startBtn');
+const app = document.getElementById('app');
+
+let progress = 0;
+const loadTimer = setInterval(() => {
+  progress += Math.random() * 12 + 4;
+  if (progress >= 100) { progress = 100; clearInterval(loadTimer); startBtn.classList.add('ready'); }
+  loadFill.style.width = progress + '%';
+}, 180);
+
+startBtn.addEventListener('click', () => {
+  SFX.start();
+  splash.classList.add('hide');
+  setTimeout(() => app.classList.add('show'), 300);
+});
+
+/* =========================================================
+   TABS & SOUND TOGGLE
+   ========================================================= */
+// ✅ FIX: Resize waveform saat tab Speaking dibuka.
+// Sebelumnya canvas dibuat saat pane masih hidden, sehingga
+// clientWidth = 0 -> canvas.width = 0 -> canvas tidak pernah tampil.
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    SFX.click();
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const pane = document.getElementById('pane-' + btn.dataset.tab);
+    pane.classList.add('active');
+
+    // ✅ FIX: refresh canvas setelah pane benar-benar visible
+    if (btn.dataset.tab === 'speaking') {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          resizeWaveform();
+          clearWaveform();
+        }, 60);
+      });
+    }
+  });
+});
+
+const soundToggle = document.getElementById('soundToggle');
+soundToggle.addEventListener('click', () => {
+  const on = SFX.toggle();
+  soundToggle.textContent = on ? '🔊 Suara: ON' : '🔇 Suara: OFF';
+  SFX.notify();
+});
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+const toast = document.getElementById('toast');
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+   DIALOG & QUESTIONS
+   ========================================================= */
+const dialog = [
+  { who:'rina', text:"Budi, can I talk to you? I have a problem...", emotion:'😟' },
+  { who:'budi', text:"Sure, Rina. What's wrong? You look tired.", emotion:'😮' },
+  { who:'rina', text:"I spend more than 6 hours a day on social media. I can't focus on studying, and I rarely sleep well.", emotion:'😢' },
+  { who:'budi', text:"That sounds serious. What do you think is the main cause?", emotion:'🤔' },
+  { who:'rina', text:"I think I'm addicted to scrolling. Every notification makes me check my phone.", emotion:'😔' }
+];
+
+const questions = [
+  { q: "Rina says she has a problem. Which expression is best for Budi to <b>ask her opinion</b>?",
+    opts: ["What do you think is the main cause?", "I totally agree with you.", "You should stop using your phone.", "That's a good point."],
+    correct: 0, explain: "'What do you think...' adalah ungkapan <b>asking opinion</b>." },
+  { q: "Which expression shows Budi <b>giving his opinion</b>?",
+    opts: ["Do you have any idea?", "How do you feel about it?", "I personally believe that social media addiction is dangerous.", "I'm not sure I agree."],
+    correct: 2, explain: "'I personally believe that...' adalah ungkapan <b>giving opinion</b>." },
+  { q: "Budi agrees with Rina. Which expression shows <b>agreeing</b>?",
+    opts: ["I see your point, but...", "You're absolutely right.", "I beg to differ.", "What do you think about it?"],
+    correct: 1, explain: "'You're absolutely right.' adalah ungkapan <b>agreeing</b>." },
+  { q: "Which sentence is the best <b>thesis</b> for an analytical exposition?",
+    opts: ["Social media is fun to use every day.", "Social media addiction among teenagers has become a serious issue that needs attention.", "I like Instagram and TikTok very much.", "My friend Rina has a new phone."],
+    correct: 1, explain: "Thesis harus memperkenalkan isu & posisi penulis secara jelas." },
+  { q: "Which connector is best to start the <b>second argument</b>?",
+    opts: ["First of all,", "In conclusion,", "Moreover,", "Once upon a time,"],
+    correct: 2, explain: "'Moreover,' digunakan untuk menambahkan argumen berikutnya." }
+];
+
+/* =========================================================
+   BUBBLE SIZE SLIDER
+   ========================================================= */
+const bubbleSize = document.getElementById('bubbleSize');
+const sizeVal = document.getElementById('sizeVal');
+bubbleSize.addEventListener('input', (e) => {
+  const size = e.target.value;
+  document.documentElement.style.setProperty('--bubble-size', size + 'px');
+  sizeVal.textContent = size + 'px';
+  const maxWidth = Math.min(320, 180 + (size - 10) * 8);
+  document.querySelectorAll('.bubble').forEach(b => b.style.maxWidth = maxWidth + 'px');
+});
+
+/* =========================================================
+   CHARACTER ANIMATION
+   ========================================================= */
+const charRina = document.getElementById('charRina');
+const charBudi = document.getElementById('charBudi');
+const charRinaSpeak = document.getElementById('charRinaSpeak');
+const bubbleL = document.getElementById('bubbleLeft');
+const bubbleR = document.getElementById('bubbleRight');
+const emoRina = document.getElementById('emoRina');
+const emoBudi = document.getElementById('emoBudi');
+const emoRinaSpeak = document.getElementById('emoRinaSpeak');
+
+function setTalking(who, isTalking, isSpeakTab = false) {
+  let el;
+  if (isSpeakTab) {
+    el = who === 'rina' ? charRinaSpeak : null;
+  } else {
+    el = who === 'rina' ? charRina : charBudi;
+  }
+  if (el) {
+    if (isTalking) el.classList.add('talking');
+    else el.classList.remove('talking');
+  }
+}
+
+function setEmotion(who, emoji, isSpeakTab = false) {
+  let el, other;
+  if (isSpeakTab) {
+    el = who === 'rina' ? emoRinaSpeak : null;
+    other = null;
+  } else {
+    el = who === 'rina' ? emoRina : emoBudi;
+    other = who === 'rina' ? emoBudi : emoRina;
+  }
+  if (el) {
+    el.textContent = emoji;
+    el.classList.add('show');
+    if (other) other.classList.remove('show');
+    clearTimeout(el._hideTimer);
+    el._hideTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  }
+}
+
+function setBubble(side, text, who) {
+  const el = side === 'left' ? bubbleL : bubbleR;
+  el.textContent = text;
+  el.classList.add('show');
+  setTalking(who, true, false);
+}
+
+function clearBubbles() {
+  bubbleL.classList.remove('show');
+  bubbleR.classList.remove('show');
+  setTalking('rina', false, false);
+  setTalking('budi', false, false);
+}
+
+let dialogCancelled = false;
+
+function playDialogLine(i, cb) {
+  if (dialogCancelled) { dialogCancelled = false; clearBubbles(); if (cb) cb(); return; }
+  if (i >= dialog.length) { clearBubbles(); if (cb) cb(); return; }
+  const line = dialog[i];
+  setBubble(line.who === 'rina' ? 'left' : 'right', line.text, line.who);
+  setEmotion(line.who, line.emotion, false);
+  SFX.speak(line.text, () => {
+    setTalking(line.who, false, false);
+    setTimeout(() => playDialogLine(i+1, cb), 400);
+  }, getVoiceOpts());
+}
+
+/* =========================================================
+   SIMULATION STATE
+   ========================================================= */
+let currentQ = 0, score = 0, simStarted = false;
+const qText = document.getElementById('qText');
+const options = document.getElementById('options');
+const feedback = document.getElementById('feedback');
+const scoreValEl = document.getElementById('scoreVal');
+const progText = document.getElementById('progText');
+const progFill = document.getElementById('progFill');
+const accentSel = document.getElementById('accentSel');
+const genderSel = document.getElementById('genderSel');
+
+function getVoiceOpts() { return { accent: accentSel.value, gender: genderSel.value }; }
+
+function renderQuestion() {
+  if (currentQ >= questions.length) {
+    qText.innerHTML = `🎉 <b>Selesai!</b> Kamu telah menyelesaikan semua soal.`;
+    options.innerHTML = '';
+    feedback.className = 'feedback show ok';
+    feedback.innerHTML = `Skor akhir: <b>${score} / ${questions.length * 20}</b>. ${score >= 60 ? 'Hebat!' : 'Coba lagi ya!'}`;
+    progText.textContent = `${questions.length} / ${questions.length}`;
+    progFill.style.width = '100%';
+    SFX.success();
+    return;
+  }
+  const q = questions[currentQ];
+  qText.innerHTML = `<b>Soal ${currentQ+1}:</b> ${q.q}`;
+  options.innerHTML = '';
+  feedback.className = 'feedback';
+  q.opts.forEach((opt, idx) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = String.fromCharCode(65+idx) + '. ' + opt;
+    div.addEventListener('click', () => handleAnswer(idx, div));
+    options.appendChild(div);
+  });
+  progText.textContent = `${currentQ} / ${questions.length}`;
+  progFill.style.width = (currentQ / questions.length * 100) + '%';
+}
+
+function handleAnswer(idx, el) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  const q = questions[currentQ];
+  document.querySelectorAll('#options .option').forEach(o => o.style.pointerEvents = 'none');
+  if (idx === q.correct) {
+    el.classList.add('correct');
+    score += 20;
+    scoreValEl.textContent = score;
+    feedback.className = 'feedback show ok';
+    feedback.innerHTML = `✅ <b>Benar!</b> ${q.explain}`;
+    SFX.success();
+    showToast('+20 poin! 🎉');
+  } else {
+    el.classList.add('wrong');
+    document.querySelectorAll('#options .option')[q.correct].classList.add('correct');
+    feedback.className = 'feedback show no';
+    feedback.innerHTML = `❌ <b>Kurang tepat.</b> ${q.explain}`;
+    SFX.error();
+  }
+  currentQ++;
+  setTimeout(renderQuestion, 2200);
+}
+
+document.getElementById('playBtn').addEventListener('click', () => {
+  SFX.click();
+  dialogCancelled = false;
+  if (!simStarted) { simStarted = true; renderQuestion(); }
+  playDialogLine(0, () => {
+    showToast('Dialog selesai. Jawab soal di panel kanan! 👉');
+    setEmotion('rina', '😊', false);
+  });
+});
+document.getElementById('stopBtn').addEventListener('click', () => {
+  SFX.click(); SFX.stopSpeak(); clearBubbles(); dialogCancelled = true;
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  SFX.click(); SFX.stopSpeak(); clearBubbles(); dialogCancelled = true;
+  currentQ = 0; score = 0; simStarted = false;
+  scoreValEl.textContent = 0;
+  qText.innerHTML = 'Tekan <b>Play Dialog</b> untuk memulai simulasi.';
+  options.innerHTML = '';
+  feedback.className = 'feedback';
+  progText.textContent = '0 / 5';
+  progFill.style.width = '0%';
+  emoRina.classList.remove('show');
+  emoBudi.classList.remove('show');
+  showToast('Simulasi direset 🔄');
+});
+
+/* =========================================================
+   PRACTICE SPEAKING
+   ========================================================= */
+const practiceSentences = [
+  "I think social media is harmful for teenagers.",
+  "In my opinion, we should limit screen time.",
+  "I totally agree with you.",
+  "Social media addiction is a serious problem.",
+  "What do you think about this issue?"
+];
+
+const practiceSel = document.getElementById('practiceSel');
+const targetSentence = document.getElementById('targetSentence');
+const recordBtn = document.getElementById('recordBtn');
+const listenExampleBtn = document.getElementById('listenExampleBtn');
+const playRecBtn = document.getElementById('playRecBtn');
+const demoBtn = document.getElementById('demoBtn');
+const waveform = document.getElementById('waveform');
+const recordResult = document.getElementById('recordResult');
+const noResult = document.getElementById('noResult');
+const recStatusDot = document.getElementById('recStatusDot');
+const recStatusText = document.getElementById('recStatusText');
+
+practiceSentences.forEach((s, i) => {
+  const opt = document.createElement('option');
+  opt.value = i;
+  opt.textContent = `${i+1}. ${s}`;
+  practiceSel.appendChild(opt);
+});
+
+function updateTarget() {
+  targetSentence.textContent = practiceSentences[practiceSel.value];
+  recordResult.classList.remove('show');
+  noResult.style.display = 'block';
+  playRecBtn.disabled = true;
+  clearWaveform();
+}
+practiceSel.addEventListener('change', updateTarget);
+updateTarget();
+
+listenExampleBtn.addEventListener('click', () => {
+  SFX.click();
+  const text = practiceSentences[practiceSel.value];
+  SFX.speak(text, () => setTalking('rina', false, true), { ...getVoiceOpts(), rate: 0.9 });
+  setTalking('rina', true, true);
+  setEmotion('rina', '🔊', true);
+  showToast('🔊 Mendengarkan contoh...');
+});
+
+/* ---- Waveform ---- */
+let waveAnimId = null;
+let audioCtx = null;
+let analyser = null;
+let isRecording = false;
+let recStartTime = 0;
+let recDuration = 0;
+
+const waveCtx = waveform.getContext('2d');
+
+// ✅ FIX: jangan set width/height ke 0 kalau clientWidth 0
+function resizeWaveform() {
+  const dpr = window.devicePixelRatio || 1;
+  const cw = waveform.clientWidth || 400;
+  const ch = waveform.clientHeight || 60;
+  waveform.width = Math.max(1, Math.floor(cw * dpr));
+  waveform.height = Math.max(1, Math.floor(ch * dpr));
+  waveCtx.setTransform(1,0,0,1,0,0);
+  waveCtx.scale(dpr, dpr);
+  waveform._cssW = cw;
+  waveform._cssH = ch;
+}
+window.addEventListener('resize', () => { resizeWaveform(); if (!isRecording) clearWaveform(); });
+
+function clearWaveform() {
+  cancelAnimationFrame(waveAnimId);
+  const w = waveform._cssW || waveform.clientWidth || 400;
+  const h = waveform._cssH || waveform.clientHeight || 60;
+  waveCtx.clearRect(0, 0, w, h);
+  waveCtx.strokeStyle = 'rgba(120,160,255,.3)';
+  waveCtx.lineWidth = 1;
+  waveCtx.beginPath();
+  waveCtx.moveTo(0, h/2);
+  waveCtx.lineTo(w, h/2);
+  waveCtx.stroke();
+}
+
+function drawWave() {
+  if (!isRecording || !analyser) return;
+  const w = waveform._cssW || waveform.clientWidth || 400;
+  const h = waveform._cssH || waveform.clientHeight || 60;
+  const bufferLen = analyser.fftSize;
+  const data = new Uint8Array(bufferLen);
+  analyser.getByteTimeDomainData(data);
+
+  waveCtx.clearRect(0, 0, w, h);
+  const grad = waveCtx.createLinearGradient(0, 0, w, 0);
+  grad.addColorStop(0, '#ef4444');
+  grad.addColorStop(0.5, '#f87171');
+  grad.addColorStop(1, '#ef4444');
+  waveCtx.strokeStyle = grad;
+  waveCtx.lineWidth = 2;
+  waveCtx.beginPath();
+
+  const slice = w / bufferLen;
+  let x = 0;
+  for (let i = 0; i < bufferLen; i++) {
+    const v = data[i] / 128.0;
+    const y = (v * h) / 2;
+    if (i === 0) waveCtx.moveTo(x, y);
+    else waveCtx.lineTo(x, y);
+    x += slice;
+  }
+  waveCtx.stroke();
+
+  waveAnimId = requestAnimationFrame(drawWave);
+}
+
+function drawSimulatedWave() {
+  if (!isRecording) return;
+  const w = waveform._cssW || waveform.clientWidth || 400;
+  const h = waveform._cssH || waveform.clientHeight || 60;
+  waveCtx.clearRect(0, 0, w, h);
+
+  const grad = waveCtx.createLinearGradient(0, 0, w, 0);
+  grad.addColorStop(0, '#a78bfa');
+  grad.addColorStop(0.5, '#c4b5fd');
+  grad.addColorStop(1, '#a78bfa');
+  waveCtx.strokeStyle = grad;
+  waveCtx.lineWidth = 2;
+  waveCtx.beginPath();
+
+  const time = Date.now() / 1000;
+  for (let x = 0; x < w; x++) {
+    const y = h/2 + Math.sin(x * 0.05 + time * 5) * 15 * Math.sin(time * 2) + Math.random() * 4 - 2;
+    if (x === 0) waveCtx.moveTo(x, y);
+    else waveCtx.lineTo(x, y);
+  }
+  waveCtx.stroke();
+  waveAnimId = requestAnimationFrame(drawSimulatedWave);
+}
+
+/* ---- RECORDING ---- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const MAX_REC_SEC = 20;
+const noResultDefault = noResult.innerHTML;
+let mediaRecorder = null, audioStream = null, audioChunks = [], recMime = '';
+let recognition = null, recogEnded = true, recogResolve = null, recogError = '';
+let finalTranscript = '', lastInterim = '', confSum = 0, confN = 0;
+let recAutoStop = null, vadTimer = null, previewAudio = null, lastRecordedUrl = null;
+let voiceFrames = 0, totalFrames = 0, voiceStart = 0, voiceEnd = 0, peakRms = 0;
+let recCancelled = false, recBusy = false;
+
+function setRecUI(state, text) {
+  recStatusDot.className = 'rec-status-dot ' + state;
+  recStatusText.textContent = text;
+}
+function resetRecButtons() {
+  recordBtn.classList.remove('recording');
+  recordBtn.innerHTML = '🎤 Rekam';
+  recordBtn.disabled = false;
+  listenExampleBtn.disabled = false;
+  demoBtn.disabled = false;
+}
+function stopPreview() {
+  if (previewAudio) { try { previewAudio.pause(); } catch(e){} previewAudio = null; }
+  playRecBtn.innerHTML = '▶ Putar Rekaman';
+}
+function pickMime() {
+  if (typeof MediaRecorder === 'undefined') return null;
+  const list = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
+  return list.find(t => { try { return MediaRecorder.isTypeSupported(t); } catch(e){ return false; } }) || '';
+}
+function handleMicError(err) {
+  console.error('Mic error:', err);
+  const map = {
+    NotAllowedError: 'Izin mikrofon ditolak. Klik ikon 🔒 di address bar → izinkan Mikrofon, lalu coba lagi.',
+    SecurityError: 'Mikrofon diblokir (bukan HTTPS/localhost). Buka lewat HTTPS atau hosting.',
+    NotFoundError: 'Mikrofon tidak ditemukan. Sambungkan mikrofon/headset.',
+    NotReadableError: 'Mikrofon sedang dipakai aplikasi lain (Zoom/Meet/dll). Tutup lalu coba lagi.',
+    OverconstrainedError: 'Pengaturan mikrofon tidak cocok dengan perangkat.'
+  };
+  const msg = map[err && err.name] || ('Error: ' + (err && err.message || err));
+  setRecUI('error', '❌ ' + msg);
+  showToast('❌ ' + msg.split('.')[0]);
+  SFX.error();
+  resetRecButtons();
+}
+
+// ✅ FIX: watchdog supaya recBusy tidak nyangkut true
+let recBusyWatchdog = null;
+function armRecBusyWatchdog() {
+  clearTimeout(recBusyWatchdog);
+  recBusyWatchdog = setTimeout(() => {
+    if (recBusy && !isRecording) {
+      console.warn('recBusy watchdog fired');
+      recBusy = false;
+      resetRecButtons();
+      setRecUI('error', '⚠️ Setup mikrofon timeout. Coba lagi.');
+    }
+  }, 12000);
+}
+
+async function startRecording() {
+  if (isRecording || recBusy) return;
+  SFX.stopSpeak(); stopPreview();
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const why = window.isSecureContext === false
+      ? 'Mikrofon hanya berfungsi lewat HTTPS atau localhost. Upload file ini ke hosting HTTPS (mis. GitHub Pages/Netlify) atau jalankan dengan localhost.'
+      : 'Browser tidak mendukung perekaman. Gunakan Chrome/Edge versi terbaru.';
+    setRecUI('error', '❌ ' + why);
+    showToast('❌ Mikrofon tidak tersedia');
+    SFX.error();
+    return;
+  }
+
+  recBusy = true; recCancelled = false;
+  armRecBusyWatchdog();
+  recordBtn.disabled = true;
+  setRecUI('demo', '⏳ Meminta izin mikrofon… klik "Allow/Izinkan"');
+
+  try {
+    audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    });
+  } catch (err) {
+    clearTimeout(recBusyWatchdog);
+    recBusy = false;
+    handleMicError(err);
+    return;
+  }
+
+  // reset state
+  audioChunks = []; finalTranscript = ''; lastInterim = ''; confSum = 0; confN = 0;
+  recogError = ''; voiceFrames = 0; totalFrames = 0; voiceStart = 0; voiceEnd = 0; peakRms = 0;
+  recordResult.classList.remove('show');
+  noResult.innerHTML = noResultDefault;
+  noResult.style.display = 'block';
+  playRecBtn.disabled = true;
+
+  // analyser
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    const source = audioCtx.createMediaStreamSource(audioStream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+    const vbuf = new Uint8Array(analyser.fftSize);
+    vadTimer = setInterval(() => {
+      try {
+        analyser.getByteTimeDomainData(vbuf);
+        let sum = 0;
+        for (let i = 0; i < vbuf.length; i++) { const v = (vbuf[i] - 128) / 128; sum += v * v; }
+        const rms = Math.sqrt(sum / vbuf.length);
+        totalFrames++;
+        peakRms = Math.max(peakRms, rms);
+        if (rms > 0.02) { voiceFrames++; const t = Date.now(); if (!voiceStart) voiceStart = t; voiceEnd = t; }
+      } catch(e) {}
+    }, 100);
+  } catch (e) { console.warn('AnalyserNode failed', e); analyser = null; }
+
+  // MediaRecorder
+  recMime = pickMime();
+  mediaRecorder = null;
+  if (recMime !== null) {
+    try {
+      mediaRecorder = recMime ? new MediaRecorder(audioStream, { mimeType: recMime }) : new MediaRecorder(audioStream);
+      mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = finishRecording;
+      mediaRecorder.onerror = e => { console.error('MediaRecorder error', e); showToast('❌ Error saat merekam'); stopRecording(); };
+      mediaRecorder.start(250);
+    } catch (e) { console.warn('MediaRecorder failed', e); mediaRecorder = null; }
+  }
+
+  // Speech recognition runs WHILE recording
+  recognition = null; recogEnded = true;
+  if (SR) {
+    try {
+      recognition = new SR();
+      recognition.lang = accentSel.value;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      recognition.onresult = (ev) => {
+        let interim = '';
+        for (let i = ev.resultIndex; i < ev.results.length; i++) {
+          const r = ev.results[i];
+          if (r.isFinal) { finalTranscript += r[0].transcript + ' '; if (r[0].confidence) { confSum += r[0].confidence; confN++; } }
+          else interim += r[0].transcript;
+        }
+        lastInterim = interim;
+        const live = (finalTranscript + interim).trim();
+        if (isRecording && live) recStatusText.textContent = '🔴 Merekam… "' + live.slice(-60) + '"';
+      };
+      recognition.onerror = (ev) => { recogError = ev.error || 'unknown'; console.warn('SpeechRecognition error:', recogError); };
+      recognition.onend = () => {
+        const fatal = ['not-allowed', 'service-not-allowed', 'audio-capture', 'network', 'language-not-supported'].includes(recogError);
+        if (isRecording && !recCancelled && !fatal) { try { recognition.start(); return; } catch (e) {} }
+        recogEnded = true;
+        if (recogResolve) { const r = recogResolve; recogResolve = null; r(); }
+      };
+      recogEnded = false;
+      recognition.start();
+    } catch (e) { console.warn('SpeechRecognition start failed', e); recognition = null; recogEnded = true; }
+  }
+
+  clearTimeout(recBusyWatchdog);
+  recStartTime = Date.now();
+  isRecording = true; recBusy = false;
+  recordBtn.disabled = false;
+  recordBtn.classList.add('recording');
+  recordBtn.innerHTML = '⏹ Stop';
+  listenExampleBtn.disabled = true; demoBtn.disabled = true;
+  setRecUI('recording', '🔴 Merekam… Ucapkan kalimat target sekarang!');
+  SFX.click();
+  showToast('🎤 Merekam… ucapkan kalimat dengan jelas!');
+  setEmotion('rina', '👂', true);
+  if (analyser) drawWave(); else drawSimulatedWave();
+  recAutoStop = setTimeout(() => { showToast('⏱ Batas rekaman ' + MAX_REC_SEC + ' detik'); stopRecording(); }, MAX_REC_SEC * 1000);
+}
+
+function stopRecording() {
+  if (!isRecording) return;
+  isRecording = false;
+  clearTimeout(recAutoStop);
+  clearTimeout(recBusyWatchdog);
+  clearInterval(vadTimer); vadTimer = null;
+  recDuration = (Date.now() - recStartTime) / 1000;
+  recordBtn.disabled = true;
+  setRecUI('demo', '⏳ Memproses rekaman…');
+  try { if (recognition) recognition.stop(); } catch (e) {}
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    try { mediaRecorder.stop(); } catch(e) { finishRecording(); }
+  } else {
+    finishRecording();
+  }
+  // ✅ FIX: safety timeout supaya tombol selalu kembali aktif
+  setTimeout(() => {
+    if (recordBtn.disabled && !isRecording) {
+      console.warn('finishRecording safety timeout fired');
+      resetRecButtons();
+      setRecUI('error', '⚠️ Analisis timeout. Coba rekam ulang.');
+    }
+  }, 6000);
+}
+
+function cancelRecording() {
+  if (!isRecording) return;
+  recCancelled = true;
+  stopRecording();
+}
+
+async function finishRecording() {
+  if (audioStream) { try { audioStream.getTracks().forEach(t => t.stop()); } catch(e){} audioStream = null; }
+  if (audioCtx && audioCtx.state !== 'closed') { try { await audioCtx.close(); } catch (e) {} }
+  audioCtx = null;
+  analyser = null;
+  cancelAnimationFrame(waveAnimId);
+  clearWaveform();
+
+  if (recCancelled) { recCancelled = false; resetRecButtons(); setRecUI('ready', 'Rekaman dibatalkan.'); return; }
+
+  if (audioChunks.length) {
+    try {
+      if (lastRecordedUrl) URL.revokeObjectURL(lastRecordedUrl);
+      const blob = new Blob(audioChunks, { type: recMime || 'audio/webm' });
+      lastRecordedUrl = URL.createObjectURL(blob);
+      playRecBtn.disabled = false;
+    } catch(e) { console.warn('Cannot create blob URL', e); }
+  }
+
+  if (recognition && !recogEnded) {
+    await new Promise(res => {
+      recogResolve = res;
+      setTimeout(() => { if (recogResolve) { recogResolve = null; res(); } }, 2000);
+    });
+  }
+
+  resetRecButtons();
+  setRecUI('ready', `✅ Rekaman selesai (${recDuration.toFixed(1)}s). Klik "Putar Rekaman" atau rekam ulang.`);
+  analyzeRecording(recDuration);
+}
+
+playRecBtn.addEventListener('click', () => {
+  SFX.click();
+  if (previewAudio) { stopPreview(); return; }
+  if (!lastRecordedUrl) return;
+  previewAudio = new Audio(lastRecordedUrl);
+  previewAudio.onended = stopPreview;
+  previewAudio.onerror = () => { stopPreview(); showToast('❌ Rekaman tidak bisa diputar'); };
+  playRecBtn.innerHTML = '⏹ Stop Putar';
+  previewAudio.play().catch(() => { stopPreview(); showToast('❌ Rekaman tidak bisa diputar'); });
+});
+
+recordBtn.addEventListener('click', () => {
+  if (isRecording) stopRecording();
+  else startRecording();
+});
+
+// stop recording if the student switches tab / sentence
+document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => { cancelRecording(); stopPreview(); }));
+practiceSel.addEventListener('change', () => { cancelRecording(); stopPreview(); });
+
+// stop recording when leaving page
+window.addEventListener('beforeunload', () => { if (isRecording) cancelRecording(); });
+
+/* ---- DEMO MODE ---- */
+demoBtn.addEventListener('click', () => {
+  if (isRecording || recBusy) return;
+  SFX.click();
+  isRecording = true;
+  recordBtn.disabled = true; demoBtn.disabled = true; listenExampleBtn.disabled = true;
+  setRecUI('demo', '🧪 Demo Mode – menganalisis contoh…');
+  showToast('🧪 Demo Mode: menampilkan contoh analisis…');
+  setEmotion('rina', '🤔', true);
+  drawSimulatedWave();
+  setTimeout(() => {
+    isRecording = false;
+    cancelAnimationFrame(waveAnimId);
+    clearWaveform();
+    resetRecButtons();
+    setRecUI('ready', '✅ Demo selesai!');
+    showDemoResults();
+  }, 3000);
+});
+
+function showDemoResults() {
+  const target = practiceSentences[practiceSel.value];
+  const ordered = target.split(/\s+/).map(w => ({ word: w, hit: true }));
+  showFullResult({ target, transcript: target, ordered, pronScore: 88, fluencyScore: 82, paceScore: 90,
+    confScore: 85, compScore: 92, overallScore: 87, wpm: 125, recDuration: 3.5, hesitationCount: 0, isDemo: true });
+}
+
+/* ---- Recording Analysis ---- */
+function analyzeRecording(totalDur) {
+  const target = practiceSentences[practiceSel.value];
+  const speechDur = (voiceStart && voiceEnd - voiceStart > 500) ? (voiceEnd - voiceStart) / 1000 : totalDur;
+  const transcript = (finalTranscript.trim() || lastInterim.trim());
+
+  if (peakRms < 0.012 && !transcript) {
+    showNoSpeech('Suara tidak terdeteksi. Pastikan mikrofon aktif, dekatkan ke mulut, lalu coba lagi.');
+    return;
+  }
+  if (recognition && !['network', 'service-not-allowed', 'language-not-supported'].includes(recogError)) {
+    if (transcript) {
+      const conf = confN ? confSum / confN : 0.8;
+      computeAllMetrics(target, transcript, conf, speechDur, totalDur);
+    } else {
+      showNoSpeech('Ucapan belum terbaca oleh Speech Recognition. Bicara lebih jelas/keras lalu coba lagi.');
+    }
+    return;
+  }
+  const note = !SR
+    ? 'Browser ini tidak mendukung Speech Recognition (gunakan Chrome/Edge).'
+    : 'Speech Recognition tidak bisa terhubung (butuh internet / layanan diblokir).';
+  showEstimateResults(target, totalDur, speechDur, note);
+}
+
+function showNoSpeech(msg) {
+  noResult.style.display = 'block';
+  noResult.innerHTML = `<div style="font-size:48px;margin-bottom:10px;">🔇</div><p style="font-size:14px;">${msg}</p>`;
+  recordResult.classList.remove('show');
+  setRecUI('error', '⚠️ ' + msg);
+  SFX.error();
+}
+
+function showEstimateResults(target, totalDur, speechDur, note) {
+  const words = target.split(/\s+/);
+  const expected = words.length * 0.5;
+  const ratio = speechDur / expected;
+  const base = Math.max(40, Math.min(90, 100 - Math.abs(1 - ratio) * 60));
+  const vr = totalFrames ? voiceFrames / totalFrames : 0;
+  const wpm = Math.round(words.length / (Math.max(speechDur, 0.5) / 60));
+  const paceScore = wpm >= 100 && wpm <= 160 ? 100 : wpm < 100 ? Math.max(0, 100 - (100 - wpm) * 1.5) : Math.max(0, 100 - (wpm - 160) * 1.2);
+  const pronScore = Math.round(base - 5), fluencyScore = Math.round(base * 0.6 + vr * 40);
+  const confScore = Math.round(Math.min(95, 50 + vr * 60)), compScore = Math.round(base);
+  const overallScore = Math.round(pronScore * .30 + fluencyScore * .25 + paceScore * .15 + confScore * .15 + compScore * .15);
+  showFullResult({ target, transcript: '(tidak tersedia – mode estimasi)', pronScore, fluencyScore,
+    paceScore: Math.round(paceScore), confScore, compScore, overallScore, wpm, recDuration: totalDur,
+    isSimulated: true, note });
+}
+
+function normalize(s) {
+  return s.toLowerCase().replace(/[^\w\s']/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function computeAllMetrics(target, transcript, confidence, speechDur, totalDur) {
+  const userWords = normalize(transcript).split(' ').filter(Boolean);
+  const used = new Set();
+  const ordered = target.split(/\s+/).map(raw => {
+    const tw = normalize(raw);
+    const idx = userWords.findIndex((uw, ui) => !used.has(ui) && uw === tw);
+    if (idx !== -1) { used.add(idx); return { word: raw, hit: true }; }
+    return { word: raw, hit: false };
+  });
+  const hitCount = ordered.filter(x => x.hit).length;
+  const pronScore = Math.round((hitCount / ordered.length) * 100);
+  const compScore = pronScore;
+  const confScore = Math.round(confidence * 100);
+
+  const wpm = speechDur > 0 ? Math.round(userWords.length / (speechDur / 60)) : 0;
+  let paceScore;
+  if (wpm >= 100 && wpm <= 160) paceScore = 100;
+  else if (wpm < 100) paceScore = Math.max(0, 100 - (100 - wpm) * 1.5);
+  else paceScore = Math.max(0, 100 - (wpm - 160) * 1.2);
+  paceScore = Math.round(paceScore);
+
+  const hesitationWords = ['um', 'uh', 'er', 'ah', 'hmm', 'uhh', 'erm'];
+  const hesitationCount = userWords.filter(w => hesitationWords.includes(w)).length;
+  const fluencyScore = Math.max(0, Math.round(confScore * 0.4 + paceScore * 0.4 + (100 - Math.min(30, hesitationCount * 10)) * 0.2));
+  const overallScore = Math.round(pronScore * .30 + fluencyScore * .25 + paceScore * .15 + confScore * .15 + compScore * .15);
+
+  showFullResult({ target, transcript, ordered, pronScore, fluencyScore, paceScore, confScore, compScore,
+    overallScore, wpm, recDuration: totalDur, hesitationCount, isSimulated: false });
+}
+
+function showFullResult(data) {
+  noResult.style.display = 'none';
+  recordResult.classList.add('show');
+
+  document.getElementById('scorePct').textContent = data.overallScore + '%';
+  const circle = document.getElementById('scoreCircle');
+  circle.style.setProperty('--score-pct', data.overallScore + '%');
+  let color = '#4ade80';
+  if (data.overallScore < 60) color = '#f87171';
+  else if (data.overallScore < 75) color = '#ffd29e';
+  else if (data.overallScore < 90) color = '#6ea8ff';
+  circle.style.setProperty('--score-color', color);
+
+  const grade = document.getElementById('overallGrade');
+  const desc = document.getElementById('overallDesc');
+  if (data.overallScore >= 90) { grade.textContent = '🏆 Excellent!'; desc.textContent = 'Speaking kamu sangat baik! Pertahankan kualitas ini.'; }
+  else if (data.overallScore >= 75) { grade.textContent = '👍 Good Job!'; desc.textContent = 'Bagus! Ada sedikit ruang untuk perbaikan.'; }
+  else if (data.overallScore >= 60) { grade.textContent = '💪 Keep Practicing!'; desc.textContent = 'Cukup baik. Latihan lebih akan meningkatkan kemampuanmu.'; }
+  else { grade.textContent = '🎯 Needs Work'; desc.textContent = 'Jangan menyerah! Coba dengarkan contoh & ulangi perlahan.'; }
+
+  animateMetricCard('cardPron', 'mPron', 'mPronBar', 'mPronFb', data.pronScore, '#4ade80',
+    data.pronScore >= 80 ? 'Great!' : data.pronScore >= 60 ? 'Good' : 'Practice', '%');
+  animateMetricCard('cardFlu', 'mFlu', 'mFluBar', 'mFluFb', data.fluencyScore, '#6ea8ff',
+    data.fluencyScore >= 80 ? 'Smooth!' : data.fluencyScore >= 60 ? 'OK' : 'Hesitant', '%');
+  animateMetricCard('cardPace', 'mPace', 'mPaceBar', 'mPaceFb', data.paceScore, '#b36eff',
+    data.wpm + ' WPM', '');
+
+  const tt = document.getElementById('targetTranscript');
+  if (data.ordered) tt.innerHTML = data.ordered.map(o => `<span style="color:${o.hit ? '#4ade80' : '#f87171'};font-weight:600;${o.hit ? '' : 'text-decoration:underline;'}">${o.word}</span>`).join(' ');
+  else tt.textContent = data.target;
+  document.getElementById('userTranscript').textContent = data.transcript || '(tidak terdeteksi)';
+
+  const fb = document.getElementById('pronFeedback');
+  let msg = '';
+  const cls = data.overallScore >= 90 ? 'excellent' : data.overallScore >= 75 ? 'good' : data.overallScore >= 60 ? 'fair' : 'poor';
+
+  msg += `<b>📊 Analisis Speaking:</b><br>`;
+  msg += `• <b>🎯 Pronunciation:</b> ${data.pronScore}% – ${data.pronScore >= 80 ? 'Pengucapan jelas dan akurat ✨' : 'Beberapa kata perlu latihan'}<br>`;
+  msg += `• <b>💬 Fluency:</b> ${data.fluencyScore}% – ${data.fluencyScore >= 80 ? 'Sangat lancar!' : 'Kurangi jeda dan filler words'}<br>`;
+  msg += `• <b>⏱️ Pace:</b> ${data.wpm} WPM – ${data.wpm >= 100 && data.wpm <= 160 ? 'Kecepatan ideal 🎯' : data.wpm < 100 ? 'Terlalu lambat, bicara lebih cepat' : 'Terlalu cepat, perlambat sedikit'}<br>`;
+  msg += `• <b>Durasi:</b> ${data.recDuration.toFixed(1)} detik<br>`;
+
+  if (data.isDemo) {
+    msg += `<br><i>🧪 <b>Demo Mode:</b> Ini adalah contoh hasil analisis. Gunakan tombol "Rekam" dengan mikrofon asli untuk hasil nyata.</i>`;
+  } else if (data.isSimulated) {
+    msg += `<br><i>⚠️ <b>Simulated Analysis:</b> ${data.note || ''} Skor hanya ESTIMASI dari durasi & aktivitas suara, bukan penilaian pengucapan sebenarnya.</i>`;
+  }
+
+  fb.className = 'feedback-text ' + cls;
+  fb.innerHTML = msg;
+
+  if (data.overallScore >= 90) SFX.success();
+  else if (data.overallScore >= 60) SFX.notify();
+  else SFX.error();
+
+  if (data.overallScore >= 75) { setEmotion('rina', '🎉', true); }
+  else if (data.overallScore >= 60) { setEmotion('rina', '👍', true); }
+  else { setEmotion('rina', '💪', true); }
+}
+
+// ✅ FIX: parameter `suffix` supaya Pace tidak menampilkan "%"
+function animateMetricCard(cardId, valId, barId, fbId, score, color, fbText, suffix) {
+  const card = document.getElementById(cardId);
+  const val = document.getElementById(valId);
+  const bar = document.getElementById(barId);
+  const fb = document.getElementById(fbId);
+
+  val.textContent = score + (suffix || '');
+  bar.style.setProperty('--bar-color', color);
+  fb.textContent = fbText;
+  fb.style.color = color;
+
+  card.classList.remove('animated');
+  bar.style.width = '0%';
+
+  setTimeout(() => {
+    card.classList.add('animated');
+    bar.style.width = Math.min(100, score) + '%';
+  }, 100);
+}
+
+/* =========================================================
+   LKPD
+   ========================================================= */
+document.getElementById('submitLkpd').addEventListener('click', () => {
+  SFX.click();
+  const name = document.getElementById('lkpd1').value.trim();
+  const a2 = document.getElementById('lkpd2').value.trim();
+  const a3 = document.querySelector('input[name="mc1"]:checked');
+  const a4 = document.getElementById('lkpd4').value.trim();
+  const a5 = document.getElementById('lkpd5').value.trim();
+  let filled = 0; const total = 5;
+  if (name) filled++;
+  if (a2.length > 15) filled++;
+  if (a3) filled++;
+  if (a4.length > 40) filled++;
+  if (a5.length > 15) filled++;
+  const result = document.getElementById('lkpdResult');
+  let msg = '';
+  if (filled === total) { msg = `✅ <b>Lengkap!</b> Terima kasih, <b>${name}</b>.`; SFX.success(); }
+  else { msg = `⚠️ Kamu baru mengisi <b>${filled}/${total}</b> bagian.`; SFX.notify(); }
+  if (a3 && a3.value !== 'b') msg += `<br>💡 <i>Petunjuk soal 3: jawaban tepat adalah <b>b</b>.</i>`;
+  result.innerHTML = msg;
+  result.classList.add('show');
+  showToast(filled === total ? 'LKPD tersimpan 💾' : 'Lengkapi dulu ya!');
+});
+
+document.getElementById('clearLkpd').addEventListener('click', () => {
+  SFX.click();
+  ['lkpd1','lkpd2','lkpd4','lkpd5'].forEach(id => document.getElementById(id).value = '');
+  document.querySelectorAll('input[name="mc1"]').forEach(r => r.checked = false);
+  document.getElementById('lkpdResult').classList.remove('show');
+  showToast('LKPD dibersihkan 🗑');
+});
+
+/* =========================================================
+   RESIZE ON LOAD + TAB SWITCH
+   ========================================================= */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    resizeWaveform();
+    clearWaveform();
+  }, 150);
+});
+</script>
+</body>
+</html>
